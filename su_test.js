@@ -26,9 +26,7 @@ async function sign_payload(payload, key){
     jwk.payloads = [
         {"claims":["family_name", "given_name"]},
         {"claims":["email"]},
-        {"claims":["birthdate"]},
-        {"claims":["age"], "cty":"hashchain-commitment"},
-        {"claims":["profile_pic"], "cty":"image/png"}]
+        {"claims":["birthdate"]}]
     console.log(JSON.stringify(jwk));
 
     // generate the ephemeral key
@@ -46,8 +44,6 @@ async function sign_payload(payload, key){
     jwp.payloads.push(encode(JSON.stringify({'family_name':'Miller','given_name':'Jer'})));
     jwp.payloads.push(encode(JSON.stringify({'email':'jer@jeremie.com'})));
     jwp.payloads.push(encode(JSON.stringify({'birthdate':'2042'})));
-    jwp.payloads.push('4yC2wv_8jXUEI9uLHrlCrnEOlR7Xl_ev_IiSsPH8Eis');
-    jwp.payloads.push(encode(readFileSync('icon.png')));
 
     
     const sigs = [];
