@@ -18,6 +18,7 @@
   "homepage": "https://github.com/quartzjer/JWP_dev#readme",
   "dependencies": {
     "express": "^4.17.1",
-    "jose": "^3.12.2"
+    "jose": "^3.12.2",
+    "@mattrglobal/bbs-signatures": "0.6.0"
   }
 }
