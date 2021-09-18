@@ -8,82 +8,111 @@ The examples below may be out of date, don't use as an authoritative reference.
 
 Exploring the API between a JWP implementation and the one or more proof algorithms internal to it.  This isn't intended for end applications, it's only the abstraction to the lower crypto engines, and as such it doesn't involve any overall container aspects.
 
+There is a lot of optionality in order to support different algorithm capabilities. The logic using this API must have it's own mechanism for consistently ordering the payloads across each entity.  It must also have external protocol mechanisms for exchanging any of the options between the entities.
+
+### Signing Request (OPTIONAL)
+
+Only for algorithms that support these options.  Requests need to be sent to the Issuer to be used when signing.
+
+Pseudocode:
+```
+// optional, if algo supports binding
+HK = holder key
+signer_request = algo.signer_request(HK, options)
+
+// optional, used to support blinded payloads
+payload_request = algo.payload_request(payload, options)
+```
+
 ### Issuer Signing
 
 * JWP only requires serialization of the protected header
   * payloads are serialized by the algorithm as-needed
-  * options are required per-payload that may be algo specific
+  * options are per-payload and may be algo specific
   * for example, blinded payloads will just be an EC point
   * algo MUST provide integrity protection
-* If the algo internally supports binding, that will be via signer options
+* If the algo internally supports binding, that will be via a sign_request
 * The algo internally structures which slot is used for the protected header
-  * addPayload() must always be called in the same order across all usages
+* addPayload() must always be called in the same order across all usages
 
 Pseudocode:
 ```
 IK = issuer key
-signer = algo.signer(IK, options)
+signer = algo.signer(IK, options) // options may include signer_request if provided
 signer.setProtected(base64(protected header))
-signer.addPayload(payload1, options)
+signer.addPayload(payload1, options) // options may include payload_request if provided
 signer.addPayload(payload2, options)
 signer.addPayload(payload3, options)
 sig = signer.sign()
 ```
 
-### Holder Verifying
+### Holder Validating
 
-* Algo MAY support a sign-request object
-  * Generators/secrets for ephemeral binding and blinding options
-  * Interface and transfer is out of scope of JWP
+Used to validate the signature was created correctly.
 
 ```
-sig_verifier = algo.sig_verifier(IK, optional signing request)
-sig_verifier.setProtected(base64(protected header))
-sig_verifier.addPayload(payload1, options)
-sig_verifier.addPayload(payload2, options)
-sig_verifier.addPayload(payload3, options)
-ok = sig_verifier.verify()
+validator = algo.validate(IK, sig, options) // options may include signer_request if used
+validator.setProtected(base64(protected header))
+validator.addPayload(payload1, options) // options may include payload_request if used 
+validator.addPayload(payload2, options)
+validator.addPayload(payload3, options)
+ok = validator.validate()
 ```
 
-### Holder Deriving
+### Proof Request (OPTIONAL)
 
-* Similar to signing
-* Deriver options MAY include algo specific items from the requesting verifier
-  * Some algos require specific verifier nonce values to be used during the derivation
-* For algos with internal binding support, deriver options would also contain keys/flags/etc
-* Deriver addPayload() behavior:
-  * no payload argument == hidden or non-disclosed payload
-  * payload and no options == fully revealed/disclosed payload
-  * payload with options is algorithm specific, may be a PoK, predicate proof request, etc
+Only for algorithms that support these options.  Requests need to be sent to the Holder to be used when deriving.
 
 Pseudocode:
 ```
-deriver = algo.deriver(sig, options)
-deriver.setProtected(base64(protected header))
-deriver.addPayload(payload1)
-deriver.addPayload()
-deriver.addPayload(payload3, options)
-proof = deriver.derive()
+// optional, if algo supports binding the proof to the verifier
+VK = verifier key
+proover_request = algo.proover_request(VK, options)
+
+// per-payload and optional, used to request predicate proofs, etc, holder applies to the correct payload
+proof_request = algo.proof_request(options)
+```
+
+### Holder Prooving
+
+* Similar to signing
+* Proover options MAY include a proover_request from the requesting verifier
+  * For example, some algos require specific verifier nonce values to be used to bind the proof to the Verifier
+* For algos with internal binding support, proover options would also contain keys/flags/etc
+* Proover addPayload() behavior:
+  * payload and no options == fully revealed/disclosed payload
+  * payload with options
+    * option for this payload to be hidden / non-disclosed
+    * other options may be algorithm specific, may be a PoK, predicate proof request, etc
+
+Pseudocode:
+```
+proover = algo.proover(sig, options)  // options may include proover_request if provided
+proover.setProtected(base64(protected header))
+proover.addPayload(payload1)
+proover.addPayload(payload2, options)  // options may include proof_request if provided
+proover.addPayload(payload3, options)
+proof = proover.proove()
 ```
 
 ### Verifier Verifying
 
-* Algo MAY support a derive-request object
+* Algo MAY support a proover-request object
   * support for custom nonce generation, etc
-* Algo MAY also support proof-request objects
+* Algo MAY also support per-payload proof-request objects
   * specific options such as range proofs, member proofs, etc 
 * This local interface and transfer of these request items to the holder is out of scope of JWP
-* addPayload behavior is similar to derive:
+* addPayload behavior is similar to proover:
   * no payload no options == hidden or non-disclosed payload
   * payload and no options == fully revealed/disclosed payload, integrety protected
   * no payload with request options is algorithm specific, may be a PoK, predicate proof request, etc
 
 ```
-proof_verifier = algo.proof_verifier(IK, optional derive request)
-proof_verifier.setProtected(base64(protected header))
-proof_verifier.addPayload(payload1)
-proof_verifier.addPayload()
-proof_verifier.addPayload(payload3, optional payload request)
+verifier = algo.verifier(IK, options)  // options may include proover_request if used
+verifier.setProtected(base64(protected header))
+verifier.addPayload(payload1)
+verifier.addPayload()
+verifier.addPayload(payload3, options)  // options may include proof_request if used
 ok = proof_verifier.proove()
 ```
 
