@@ -67,19 +67,19 @@ Pseudocode:
 ```
 // optional, if algo supports binding the proof to the verifier
 VK = verifier key
-proover_request = algo.proover_request(VK, options)
+prover_request = algo.prover_request(VK, options)
 
 // per-payload and optional, used to request predicate proofs, etc, holder applies to the correct payload
 proof_request = algo.proof_request(options)
 ```
 
-### Holder Prooving
+### Holder Proving
 
 * Similar to signing
-* Proover options MAY include a proover_request from the requesting verifier
+* prover options MAY include a prover_request from the requesting verifier
   * For example, some algos require specific verifier nonce values to be used to bind the proof to the Verifier
-* For algos with internal binding support, proover options would also contain keys/flags/etc
-* Proover addPayload() behavior:
+* For algos with internal binding support, prover options would also contain keys/flags/etc
+* prover addPayload() behavior:
   * payload and no options == fully revealed/disclosed payload
   * payload with options
     * option for this payload to be hidden / non-disclosed
@@ -87,33 +87,33 @@ proof_request = algo.proof_request(options)
 
 Pseudocode:
 ```
-proover = algo.proover(sig, options)  // options may include proover_request if provided
-proover.setProtected(base64(protected header))
-proover.addPayload(payload1)
-proover.addPayload(payload2, options)  // options may include proof_request if provided
-proover.addPayload(payload3, options)
-proof = proover.proove()
+prover = algo.prover(sig, options)  // options may include prover_request if provided
+prover.setProtected(base64(protected header))
+prover.addPayload(payload1)
+prover.addPayload(payload2, options)  // options may include proof_request if provided
+prover.addPayload(payload3, options)
+proof = prover.prove()
 ```
 
 ### Verifier Verifying
 
-* Algo MAY support a proover-request object
+* Algo MAY support a prover-request object
   * support for custom nonce generation, etc
 * Algo MAY also support per-payload proof-request objects
   * specific options such as range proofs, member proofs, etc 
 * This local interface and transfer of these request items to the holder is out of scope of JWP
-* addPayload behavior is similar to proover:
+* addPayload behavior is similar to prover:
   * no payload no options == hidden or non-disclosed payload
   * payload and no options == fully revealed/disclosed payload, integrety protected
   * no payload with request options is algorithm specific, may be a PoK, predicate proof request, etc
 
 ```
-verifier = algo.verifier(IK, options)  // options may include proover_request if used
+verifier = algo.verifier(IK, options)  // options may include prover_request if used
 verifier.setProtected(base64(protected header))
 verifier.addPayload(payload1)
 verifier.addPayload()
 verifier.addPayload(payload3, options)  // options may include proof_request if used
-ok = proof_verifier.proove()
+ok = proof_verifier.prove()
 ```
 
 
