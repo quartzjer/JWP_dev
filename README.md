@@ -42,7 +42,8 @@ JWK
 
 Protected Header
 ```json
-  {"kid": "j_Qk9HpoLTpP0dnTqruqK9hMVsKQSx8W9o73x1X9b2I",
+{
+  "kid": "j_Qk9HpoLTpP0dnTqruqK9hMVsKQSx8W9o73x1X9b2I",
   "iss": "https://issuer.tld"
 }
 ```
