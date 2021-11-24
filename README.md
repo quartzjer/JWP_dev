@@ -246,3 +246,22 @@ Protected
     "typ": "JOSE+Proof"
 }
 ```
+
+### work area
+
+```json
+{
+    "kty": "ZKP",
+    "crv": "Bls12381G2",
+    "x": "qM4Gi4razIIAXpDSlHB7-pPoo6GOChoBbSLxr7rNwb8mxyVykbmKQGNb0kI7iegDAs9cIwf6DAsCGi7BVs48MG-iw4PsP0L136g2gQpZjrKsr4GbkV5EIx0R2BjIJNfQ",
+    "kid": "HjfcpyjuZQ-O8Ye2hQnNbT9RbbnrobptdnExR0DUjU8",
+    "alg": "BBS",
+    "use": "proof",
+    "jpt": {
+        "iat": [0],
+        "exp": [1],
+        "name": [2],
+        "email": [3]
+    }
+}
+```

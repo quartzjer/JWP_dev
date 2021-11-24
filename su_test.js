@@ -23,11 +23,13 @@ async function sign_payload(payload, key){
     jwk.alg = 'ES256';
     jwk.alg = 'SU-' + jwk.alg;
     jwk.use = 'proof';
-    jwk.payloads = [
-        {"claims":["family_name", "given_name"]},
-        {"claims":["email"]},
-        {"claims":["birthdate"]}]
-    console.log(JSON.stringify(jwk));
+    jwk.lyt = {
+        "family_name":[0],
+        "given_name":[1],
+        "email":[2],
+        "age":[3]
+    }
+    console.log(JSON.stringify(jwk,0,2));
 
     // generate the ephemeral key
     const ephemeral = await generateKeyPair('ES256');
@@ -37,13 +39,14 @@ async function sign_payload(payload, key){
     const jwp = {payloads:[]};
     const protected = {};
     protected.kid = jwk.kid;
-    protected.issuer = 'https://issuer.tld';
-    protected.typ = 'JOSE+Proof';
-    protected.proof_jwk = ejwk;
+    protected.iss = 'https://issuer.tld';
+//    protected.typ = 'JOSE+Proof';
+//    protected.proof_jwk = ejwk;
     jwp.protected = encode(JSON.stringify(protected));
-    jwp.payloads.push(encode(JSON.stringify({'family_name':'Miller','given_name':'Jer'})));
-    jwp.payloads.push(encode(JSON.stringify({'email':'jer@jeremie.com'})));
-    jwp.payloads.push(encode(JSON.stringify({'birthdate':'2042'})));
+    jwp.payloads.push(encode(JSON.stringify('Miller')));
+    jwp.payloads.push(encode(JSON.stringify('Jeremie')));
+    jwp.payloads.push(encode(JSON.stringify('jer@jeremie.com')));
+    jwp.payloads.push(encode(JSON.stringify(42)));
 
     
     const sigs = [];
@@ -62,11 +65,13 @@ async function sign_payload(payload, key){
     const final_sig = await sign_payload(encode(final), signer.privateKey);
     final = Buffer.concat([final, decode(final_sig)]);
     jwp.proof = encode(final);
-    console.log(JSON.stringify(jwp));
+    console.log(JSON.stringify(jwp,0,2));
 
 
     const serialized = [];
     serialized.push(encode(JSON.stringify(jwp.protected)));
-    const payloads = [];
+    serialized.push(jwp.payloads.join('~'));
+    serialized.push(jwp.proof);
+    console.log(serialized.join('.'));
     
 })();
