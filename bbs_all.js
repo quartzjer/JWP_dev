@@ -21,28 +21,31 @@ const { GeneralSign } = require('jose/jws/general/sign');
     const jwk = {};
     jwk.kty = 'OKP';
     jwk.crv = 'Bls12381G2';
-    jwk.x = Buffer.from(keyPair.publicKey).toString("base64url");
+    jwk.x = Buffer.from(keyPair.publicKey).toString('base64url');
     jwk.kid = await calculateThumbprint(jwk);
-    jwk.alg = 'BBS';
+    jwk.alg = 'BBS+';
     jwk.use = 'proof';
-    jwk.payloads = [
-        {"claims":["family_name", "given_name"]},
-        {"claims":["email"]},
-        {"claims":["birthdate"]}]
-    console.log(JSON.stringify(jwk));
+    jwk.lyt = {
+        'family_name':[0],
+        'given_name':[1],
+        'email':[2],
+        'age':[3]
+    }
+    console.log(JSON.stringify(jwk,0,2));
 
     // generate jwp
     const jwp = {};
     const protected = {};
     protected.kid = jwk.kid;
     protected.issuer = 'https://issuer.tld';
-    protected.typ = 'JOSE+Proof';
+//    protected.typ = 'JOSE+Proof';
     const protected_buff = Buffer.from(JSON.stringify(protected), 'utf8');
     jwp.protected = encode(protected_buff);
     const payloads_buff = [
-        Buffer.from(JSON.stringify({'family_name':'Miller','given_name':'Jer'}), "utf8"),
-        Buffer.from(JSON.stringify({'email':'jer@jeremie.com'}), "utf8"),
-        Buffer.from(JSON.stringify({'birthdate':'2042'}), "utf8")
+        Buffer.from(JSON.stringify('Miller'), 'utf8'),
+        Buffer.from(JSON.stringify('Jeremie'), 'utf8'),
+        Buffer.from(JSON.stringify('jer@jeremie.com'), 'utf8'),
+        Buffer.from(JSON.stringify(42), 'utf8')
     ];
     jwp.payloads = payloads_buff.map(encode);
     
@@ -55,7 +58,13 @@ const { GeneralSign } = require('jose/jws/general/sign');
     });
   
     jwp.proof = encode(signature);
-    console.log(JSON.stringify(jwp));
+    console.log(JSON.stringify(jwp,0,2));
+
+    const serialized = [];
+    serialized.push(encode(JSON.stringify(jwp.protected)));
+    serialized.push(jwp.payloads.join('~'));
+    serialized.push(jwp.proof);
+    console.log(serialized.join('.'));
 
 
 })();
