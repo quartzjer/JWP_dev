@@ -35,8 +35,8 @@ async function sign_payload(payload, key){
     protected.kid = jwk.kid;
     protected.iss = 'https://issuer.tld';
     protected.claims = ['family_name', 'given_name', 'email', 'age']
-    //protected.typ = 'JOSE+Proof';
-    //protected.proof_jwk = ejwk;
+    protected.typ = 'JPT';
+    protected.proof_jwk = ejwk;
     console.log(JSON.stringify(protected, 0, 2));
 
     jwp.protected = encode(JSON.stringify(protected));

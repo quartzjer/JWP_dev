@@ -25,43 +25,70 @@ const { GeneralSign } = require('jose/jws/general/sign');
     jwk.kid = await calculateThumbprint(jwk);
     jwk.alg = 'BBS+';
     jwk.use = 'proof';
+    console.log('JWK:');
     console.log(JSON.stringify(jwk,0,2));
 
     // generate jwp
     const jwp = {};
     const protected = {};
-    protected.kid = jwk.kid;
-    protected.issuer = 'https://issuer.tld';
+    protected.typ = 'JPT';
+    protected.alg = jwk.alg;
+//    protected.kid = jwk.kid;
+//    protected.issuer = 'https://issuer.tld';
     protected.claims = ['family_name', 'given_name', 'email', 'age']
-    //protected.typ = 'JOSE+Proof';
+    console.log()
+    console.log('Protected Header:');
     console.log(JSON.stringify(protected, 0, 2));
 
     const protected_buff = Buffer.from(JSON.stringify(protected), 'utf8');
     jwp.protected = encode(protected_buff);
     const payloads_buff = [
-        Buffer.from(JSON.stringify('Miller'), 'utf8'),
-        Buffer.from(JSON.stringify('Jeremie'), 'utf8'),
-        Buffer.from(JSON.stringify('jer@jeremie.com'), 'utf8'),
+        Buffer.from(JSON.stringify('Doe'), 'utf8'),
+        Buffer.from(JSON.stringify('Jay'), 'utf8'),
+        Buffer.from(JSON.stringify('jaydoe@example.org'), 'utf8'),
         Buffer.from(JSON.stringify(42), 'utf8')
     ];
     jwp.payloads = payloads_buff.map(encode);
     
     let messages = [];
     messages.push(Uint8Array.from(protected_buff));
-    messages.concat(payloads_buff.map((item)=>Uint8Array.from(item)));
+    messages = messages.concat(payloads_buff.map((item)=>Uint8Array.from(item)));
     const signature = await blsSign({
         keyPair,
         messages
     });
   
     jwp.proof = encode(signature);
+    console.log()
+    console.log('JSON Serialization:');
     console.log(JSON.stringify(jwp,0,2));
 
     const serialized = [];
     serialized.push(encode(JSON.stringify(jwp.protected)));
     serialized.push(jwp.payloads.join('~'));
     serialized.push(jwp.proof);
+    console.log()
+    console.log('Compact Serialization:');
     console.log(serialized.join('.'));
 
+    // generate a proof with selective disclosure of only the name and age
+    const proof = await blsCreateProof({
+        signature,
+        publicKey: keyPair.publicKey,
+        messages,
+        nonce: Uint8Array.from(Buffer.from("nonce", "utf8")),
+        revealed: [0,2,4],
+    });
+    jwp.payloads[0] = '';
+    jwp.payloads[2] = '';
+
+    const presentation = [];
+    presentation.push(encode(JSON.stringify(jwp.protected)));
+    presentation.push(jwp.payloads.join('~'));
+    presentation.push(encode(proof));
+    console.log()
+    console.log('Compact Presentation:');
+    console.log(presentation.join('.'));
+      
 
 })();
