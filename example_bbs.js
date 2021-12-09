@@ -25,12 +25,6 @@ const { GeneralSign } = require('jose/jws/general/sign');
     jwk.kid = await calculateThumbprint(jwk);
     jwk.alg = 'BBS+';
     jwk.use = 'proof';
-    jwk.lyt = {
-        'family_name':[0],
-        'given_name':[1],
-        'email':[2],
-        'age':[3]
-    }
     console.log(JSON.stringify(jwk,0,2));
 
     // generate jwp
@@ -38,7 +32,10 @@ const { GeneralSign } = require('jose/jws/general/sign');
     const protected = {};
     protected.kid = jwk.kid;
     protected.issuer = 'https://issuer.tld';
-//    protected.typ = 'JOSE+Proof';
+    protected.claims = ['family_name', 'given_name', 'email', 'age']
+    //protected.typ = 'JOSE+Proof';
+    console.log(JSON.stringify(protected, 0, 2));
+
     const protected_buff = Buffer.from(JSON.stringify(protected), 'utf8');
     jwp.protected = encode(protected_buff);
     const payloads_buff = [

@@ -23,12 +23,6 @@ async function sign_payload(payload, key){
     jwk.alg = 'ES256';
     jwk.alg = 'SU-' + jwk.alg;
     jwk.use = 'proof';
-    jwk.lyt = {
-        "family_name":[0],
-        "given_name":[1],
-        "email":[2],
-        "age":[3]
-    }
     console.log(JSON.stringify(jwk,0,2));
 
     // generate the ephemeral key
@@ -40,8 +34,11 @@ async function sign_payload(payload, key){
     const protected = {};
     protected.kid = jwk.kid;
     protected.iss = 'https://issuer.tld';
-//    protected.typ = 'JOSE+Proof';
-//    protected.proof_jwk = ejwk;
+    protected.claims = ['family_name', 'given_name', 'email', 'age']
+    //protected.typ = 'JOSE+Proof';
+    //protected.proof_jwk = ejwk;
+    console.log(JSON.stringify(protected, 0, 2));
+
     jwp.protected = encode(JSON.stringify(protected));
     jwp.payloads.push(encode(JSON.stringify('Miller')));
     jwp.payloads.push(encode(JSON.stringify('Jeremie')));

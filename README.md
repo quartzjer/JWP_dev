@@ -25,47 +25,46 @@ JWK
 ```json
 {
   "kty": "EC",
-  "x": "sc9sq4tfzYuBSzscCFqdt9MdY2q6EwHcWmld_mKyaOE",
-  "y": "KO5y4om5dwuNn_4zk_hKns3YXH0fbq2K-Awp6ikwRVc",
+  "x": "3Gw_RV47CvLyqnXvuCHybn5aj2ACo_0YZEo9HhDTtQo",
+  "y": "l7M9IGTmWB9IjhzHAimUY0GSgxgaiu5BIHnqQ6McHhA",
   "crv": "P-256",
-  "kid": "j_Qk9HpoLTpP0dnTqruqK9hMVsKQSx8W9o73x1X9b2I",
+  "kid": "tEB7zx2XKlq8A-9h5arvXlhcDREbWhD7lG2WxKtN39c",
   "alg": "SU-ES256",
-  "use": "proof",
-  "lyt": {
-    "family_name": [0],
-    "given_name": [1],
-    "email": [2],
-    "age": [3]
-  }
+  "use": "proof"
 }
 ```
 
 Protected Header
 ```json
 {
-  "kid": "j_Qk9HpoLTpP0dnTqruqK9hMVsKQSx8W9o73x1X9b2I",
-  "iss": "https://issuer.tld"
+  "kid": "tEB7zx2XKlq8A-9h5arvXlhcDREbWhD7lG2WxKtN39c",
+  "iss": "https://issuer.tld",
+  "claims": [
+    "family_name",
+    "given_name",
+    "email",
+    "age"
+  ]
 }
 ```
-
 
 JWP JSON
 ```json
 {
-  "protected": "eyJraWQiOiJqX1FrOUhwb0xUcFAwZG5UcXJ1cUs5aE1Wc0tRU3g4VzlvNzN4MVg5YjJJIiwiaXNzIjoiaHR0cHM6Ly9pc3N1ZXIudGxkIn0",
   "payloads": [
     "Ik1pbGxlciI",
     "IkplcmVtaWUi",
     "ImplckBqZXJlbWllLmNvbSI",
     "NDI"
   ],
-  "proof": "bHlkva5uqXN66qMIE5yQX8uUY_vPddhTOvJSPXWQNUYNv34AozdbfJMc8NVMfuixwniz6DFMXNgqYlpWoGZCOPjBrWTlDnl6rsO0I9oB5q3eOimFnZnXrg6WcQaOBS1-V9eniFKhl9DWTm5EVeqfNbBKRTgDxQBcX3Nc0gPND4QtM22kSZphvfmdX_7_ihuT89FuM-0Tm6pjcIRSaFw01QzeXdM0Y5K0QhrtDu2mK6hua2w48pZ6Dag_ATexLV4o1yIHPuMsQIQu2CdfdKpq6RGSz2rImelYHR8_i7m8dZCuEst_AaWMxQqE6VtqnhV0m1BVIRKpfe4me1130n7sc8r74zv9f7xAhM1WQjdh1v4BkeVN3YE83sU3D61o1wKCiK9TVw_0vdBJD7OaWrmHbVcTvyigQyvkkqtngtGOgGj8AHi9d8LcyAT2ARO-p5iAOfBsWbB47XFP0SXdHB-7ejAcgIOyJ7DwRNPXQK_1KyvqBfRxGnTPW_F00Z9gF-4m"
+  "protected": "eyJraWQiOiJ0RUI3engyWEtscThBLTloNWFydlhsaGNEUkViV2hEN2xHMld4S3ROMzljIiwiaXNzIjoiaHR0cHM6Ly9pc3N1ZXIudGxkIiwiY2xhaW1zIjpbImZhbWlseV9uYW1lIiwiZ2l2ZW5fbmFtZSIsImVtYWlsIiwiYWdlIl19",
+  "proof": "Vq6xf3UOtN7fDcmwMQw9aoOq6lCrbpla0aeZIo4mEmGgHZw9QxBb4y5cFUgMhKkoHTsvyzmZXwQ3C3ZXA5liIG-JHY943Bsu4B-zvjG58srhhnM8EH7MhXaeRdn01VB6x4xllJu3JvGKFEczVOEPUmGySkA8sL-opp9ilMTS7ZKfJQdhuzQyYs-34aIs_LtlCD0D0hvHomT8CqGLXRjqQPSkpm58fX0KtERTD6ga9mMqZRI9-7LcZC11jV8HGauHLn4ip8PXYtkc03RkQJESzQwsBoRsrzUUAwesDjqrWNHzxeQPu1sDTafvtNT3Eks5924wsFG59lq1eFugpor7zwNysCRhtHdyrFfWa7CksbtIz57yDHgk9S5e0K5hdDr3wEhfzN6CzuHi6xHmIVw6d5P-EGYjQ3IpEvGGwxlwAIivTmDefZRDdcsYud3FY6Dyvs2zHREAJ3XjB74QOnV-fGpmjYii5sn493WtmssFKIq1GLBFU2typPO8x-bMztAL"
 }
 ```
 
 JWP Compact
 ```
-ImV5SnJhV1FpT2lKcVgxRnJPVWh3YjB4VWNGQXdaRzVVY1hKMWNVczVhRTFXYzB0UlUzZzRWemx2TnpONE1WZzVZakpKSWl3aWFYTnpJam9pYUhSMGNITTZMeTlwYzNOMVpYSXVkR3hrSW4wIg.Ik1pbGxlciI~IkplcmVtaWUi~ImplckBqZXJlbWllLmNvbSI~NDI.bHlkva5uqXN66qMIE5yQX8uUY_vPddhTOvJSPXWQNUYNv34AozdbfJMc8NVMfuixwniz6DFMXNgqYlpWoGZCOPjBrWTlDnl6rsO0I9oB5q3eOimFnZnXrg6WcQaOBS1-V9eniFKhl9DWTm5EVeqfNbBKRTgDxQBcX3Nc0gPND4QtM22kSZphvfmdX_7_ihuT89FuM-0Tm6pjcIRSaFw01QzeXdM0Y5K0QhrtDu2mK6hua2w48pZ6Dag_ATexLV4o1yIHPuMsQIQu2CdfdKpq6RGSz2rImelYHR8_i7m8dZCuEst_AaWMxQqE6VtqnhV0m1BVIRKpfe4me1130n7sc8r74zv9f7xAhM1WQjdh1v4BkeVN3YE83sU3D61o1wKCiK9TVw_0vdBJD7OaWrmHbVcTvyigQyvkkqtngtGOgGj8AHi9d8LcyAT2ARO-p5iAOfBsWbB47XFP0SXdHB-7ejAcgIOyJ7DwRNPXQK_1KyvqBfRxGnTPW_F00Z9gF-4m
+ImV5SnJhV1FpT2lKMFJVSTNlbmd5V0V0c2NUaEJMVGxvTldGeWRsaHNhR05FVWtWaVYyaEVOMnhITWxkNFMzUk9NemxqSWl3aWFYTnpJam9pYUhSMGNITTZMeTlwYzNOMVpYSXVkR3hrSWl3aVkyeGhhVzF6SWpwYkltWmhiV2xzZVY5dVlXMWxJaXdpWjJsMlpXNWZibUZ0WlNJc0ltVnRZV2xzSWl3aVlXZGxJbDE5Ig.Ik1pbGxlciI~IkplcmVtaWUi~ImplckBqZXJlbWllLmNvbSI~NDI.Vq6xf3UOtN7fDcmwMQw9aoOq6lCrbpla0aeZIo4mEmGgHZw9QxBb4y5cFUgMhKkoHTsvyzmZXwQ3C3ZXA5liIG-JHY943Bsu4B-zvjG58srhhnM8EH7MhXaeRdn01VB6x4xllJu3JvGKFEczVOEPUmGySkA8sL-opp9ilMTS7ZKfJQdhuzQyYs-34aIs_LtlCD0D0hvHomT8CqGLXRjqQPSkpm58fX0KtERTD6ga9mMqZRI9-7LcZC11jV8HGauHLn4ip8PXYtkc03RkQJESzQwsBoRsrzUUAwesDjqrWNHzxeQPu1sDTafvtNT3Eks5924wsFG59lq1eFugpor7zwNysCRhtHdyrFfWa7CksbtIz57yDHgk9S5e0K5hdDr3wEhfzN6CzuHi6xHmIVw6d5P-EGYjQ3IpEvGGwxlwAIivTmDefZRDdcsYud3FY6Dyvs2zHREAJ3XjB74QOnV-fGpmjYii5sn493WtmssFKIq1GLBFU2typPO8x-bMztAL
 ```
 
 # BBS
@@ -75,44 +74,44 @@ JWK
 {
   "kty": "OKP",
   "crv": "Bls12381G2",
-  "x": "rH-OP420WFf4TmOgfbmsFu4YLVTDDcCYwApM04NlLEJDF2dcjDLduHhbt2npqg8gCuxUcXyQH7rCPssBNtJDzjRgs2p8L9L0DZYSIU--MeH-cyui1MKFaxlJz6N8hfKY",
-  "kid": "m-noJoLMgMuXl5NJ-IkPi-NbureQB3qrFBCo88gnSjA",
+  "x": "liFtc7SMu94i1AC5dsuNuBOAu8eb7C2ZXJHSrLoornwhpc9Ewveh7uMVaQp7_qcRCc_VsyiKTrOKdDTJwgluFC6RDzHrwpMgeRarI-ucK0GL9_5UCdSj2aQErGkWbJ0E",
+  "kid": "P80NWuuGdo8wF0BS3QgvEwcUezIWmgdf_qAu9wGOMT4",
   "alg": "BBS+",
-  "use": "proof",
-  "lyt": {
-    "family_name": [0],
-    "given_name": [1],
-    "email": [2],
-    "age": [3]
-  }
+  "use": "proof"
 }
 ```
 
 Protected Header
 ```json
 {
-  "kid": "m-noJoLMgMuXl5NJ-IkPi-NbureQB3qrFBCo88gnSjA",
-  "issuer": "https://issuer.tld"
+  "kid": "P80NWuuGdo8wF0BS3QgvEwcUezIWmgdf_qAu9wGOMT4",
+  "issuer": "https://issuer.tld",
+  "claims": [
+    "family_name",
+    "given_name",
+    "email",
+    "age"
+  ]
 }
 ```
 
 JWP JSON
 ```json
 {
-  "protected": "eyJraWQiOiJtLW5vSm9MTWdNdVhsNU5KLUlrUGktTmJ1cmVRQjNxckZCQ284OGduU2pBIiwiaXNzdWVyIjoiaHR0cHM6Ly9pc3N1ZXIudGxkIn0",
+  "protected": "eyJraWQiOiJQODBOV3V1R2RvOHdGMEJTM1FndkV3Y1VleklXbWdkZl9xQXU5d0dPTVQ0IiwiaXNzdWVyIjoiaHR0cHM6Ly9pc3N1ZXIudGxkIiwiY2xhaW1zIjpbImZhbWlseV9uYW1lIiwiZ2l2ZW5fbmFtZSIsImVtYWlsIiwiYWdlIl19",
   "payloads": [
     "Ik1pbGxlciI",
     "IkplcmVtaWUi",
     "ImplckBqZXJlbWllLmNvbSI",
     "NDI"
   ],
-  "proof": "okgCB3-zyXlWBRQtv8of3I8WfksTZe0Ls-eiFWH1lAhWI6kAw51kdOuubQS-AkPeYUHlKfzccE4m7waZyoLEkBLFiK2g54Q2i-CdtYBgDdkUDsoULSBMcH1MwGHwdjfXpldFNFrHFx_IAvLVniyeMQ"
+  "proof": "uU1G3McaQjdeNIvjV0Yhs9au0roJtcRnQi_ShdiKf_unWbS_4NCfApOUKoq5VGRyYUHlKfzccE4m7waZyoLEkBLFiK2g54Q2i-CdtYBgDdkUDsoULSBMcH1MwGHwdjfXpldFNFrHFx_IAvLVniyeMQ"
 }
 ```
 
 JWP Compact
 ```
-ImV5SnJhV1FpT2lKdExXNXZTbTlNVFdkTmRWaHNOVTVLTFVsclVHa3RUbUoxY21WUlFqTnhja1pDUTI4NE9HZHVVMnBCSWl3aWFYTnpkV1Z5SWpvaWFIUjBjSE02THk5cGMzTjFaWEl1ZEd4a0luMCI.Ik1pbGxlciI~IkplcmVtaWUi~ImplckBqZXJlbWllLmNvbSI~NDI.okgCB3-zyXlWBRQtv8of3I8WfksTZe0Ls-eiFWH1lAhWI6kAw51kdOuubQS-AkPeYUHlKfzccE4m7waZyoLEkBLFiK2g54Q2i-CdtYBgDdkUDsoULSBMcH1MwGHwdjfXpldFNFrHFx_IAvLVniyeMQ
+ImV5SnJhV1FpT2lKUU9EQk9WM1YxUjJSdk9IZEdNRUpUTTFGbmRrVjNZMVZsZWtsWGJXZGtabDl4UVhVNWQwZFBUVlEwSWl3aWFYTnpkV1Z5SWpvaWFIUjBjSE02THk5cGMzTjFaWEl1ZEd4a0lpd2lZMnhoYVcxeklqcGJJbVpoYldsc2VWOXVZVzFsSWl3aVoybDJaVzVmYm1GdFpTSXNJbVZ0WVdsc0lpd2lZV2RsSWwxOSI.Ik1pbGxlciI~IkplcmVtaWUi~ImplckBqZXJlbWllLmNvbSI~NDI.uU1G3McaQjdeNIvjV0Yhs9au0roJtcRnQi_ShdiKf_unWbS_4NCfApOUKoq5VGRyYUHlKfzccE4m7waZyoLEkBLFiK2g54Q2i-CdtYBgDdkUDsoULSBMcH1MwGHwdjfXpldFNFrHFx_IAvLVniyeMQ
 ```
 
 # Generic Algorigthm Interface
