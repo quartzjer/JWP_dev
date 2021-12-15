@@ -5,7 +5,23 @@ const { calculateThumbprint } = require('jose/jwk/thumbprint');
 const { encode, decode } = require('jose/util/base64url');
 const { readFileSync } = require('fs');
 const { GeneralSign } = require('jose/jws/general/sign');
+const { parseJwk } = require('jose/jwk/parse');
 
+const stable_key = {
+    "kty": "EC",
+    "x": "ONebN43-G5DOwZX6jCVpEYEe0bYd5WDybXAG0sL3iDA",
+    "y": "b0MHuYfSxu3Pj4DAyDXabAc0mPjpB1worEpr3yyrft4",
+    "crv": "P-256",
+    "d": "jnE0-9YvxQtLJEKcyUHU6HQ3Y9nSDnh0NstYJFn7RuI"
+};
+
+const ephemeral_key = {
+    "kty": "EC",
+    "x": "acbIQiuMs3i8_uszEjJ2tpTtRM4EU3yz91PH6CdH2V0",
+    "y": "_KcyLj9vWMptnmKtm46GqDz8wf74I5LKgrl2GzH3nSE",
+    "crv": "P-256",
+    "d": "Yfg5t1lo9T36QJJkrX0XiPd8Bj0Z6dt3zNqGIkyuOFc"
+}
 
 // hack working around jose wrapper
 async function sign_payload(payload, key){
@@ -15,57 +31,121 @@ async function sign_payload(payload, key){
     return jws.signatures[0].signature;
 }
 
+function octet_array(value)
+{
+    if(!Array.isArray(value)) value = Array.from(new TextEncoder("utf-8").encode((value)));
+    return JSON.stringify(value).split(',').join(', ')
+}
+
 (async function(){
     // generate the long-term public key
-    const signer = await generateKeyPair('ES256');
-    const jwk = await fromKeyLike(signer.privateKey);
-    jwk.kid = await calculateThumbprint(jwk);
+//    const signer = await generateKeyPair('ES256');
+    const stable = {};
+    stable.privateKey = await parseJwk(stable_key, 'ES256');
+    delete stable_key.d;
+    stable.publicKey = await parseJwk(stable_key, 'ES256');
+    const jwk = await fromKeyLike(stable.privateKey);
+//    jwk.kid = await calculateThumbprint(jwk);
     console.log('Issuer JWK:');
     console.log(JSON.stringify(jwk,0,2));
 
     // generate the ephemeral key
-    const ephemeral = await generateKeyPair('ES256');
+//    const ephemeral = await generateKeyPair('ES256');
+    const ephemeral = {};
+    ephemeral.privateKey = await parseJwk(ephemeral_key, 'ES256');
+    delete ephemeral_key.d;
+    ephemeral.publicKey = await parseJwk(ephemeral_key, 'ES256');
     const ejwk = await fromKeyLike(ephemeral.publicKey);
     const ejwk_private = await fromKeyLike(ephemeral.privateKey);
     console.log();
     console.log('Ephemeral JWK:');
     console.log(JSON.stringify(ejwk_private,0,2));
 
+    // storage as we build up
+    const sigs = [];
     const jwp = {payloads:[]};
+
+    // create the protected header first
     const protected = {};
-    protected.kid = jwk.kid;
+//    protected.kid = jwk.kid;
     protected.iss = 'https://issuer.tld';
     protected.claims = ['family_name', 'given_name', 'email', 'age']
     protected.typ = 'JPT';
     protected.proof_jwk = ejwk;
     protected.alg = 'SU-ES256';
+    jwp.protected = encode(JSON.stringify(protected));
     console.log();
     console.log('Protected Header:');
     console.log(JSON.stringify(protected, 0, 2));
+    console.log('octets:', octet_array(JSON.stringify(protected)));
+    console.log('encoded:', jwp.protected);
 
-    jwp.protected = encode(JSON.stringify(protected));
-    jwp.payloads.push(encode(JSON.stringify('"Doe"')));
-    jwp.payloads.push(encode(JSON.stringify('"Jay"')));
-    jwp.payloads.push(encode(JSON.stringify('"jaydoe@example.org"')));
-    jwp.payloads.push(encode(JSON.stringify(42)));
-
-    
-    const sigs = [];
-    let signature = await sign_payload(jwp.protected, ephemeral.privateKey);
+    // encode/sign each payload
+    payload = JSON.stringify('Doe');
+    encoded = encode(payload);
+    jwp.payloads.push(encoded);
+    signature = await sign_payload(encoded, ephemeral.privateKey);
     sigs.push(signature);
-    for(payload of jwp.payloads)
-    {
-        signature = await sign_payload(payload, ephemeral.privateKey);
-        sigs.push(signature);
-    }
+    console.log();
+    console.log('payload:', encoded);
+    console.log('octets:', octet_array(payload));
+    console.log('sig:', signature);
+    console.log('octets:', octet_array(Array.from(decode(signature))));
+
+    payload = JSON.stringify('Jay');
+    encoded = encode(payload);
+    jwp.payloads.push(encoded);
+    signature = await sign_payload(encoded, ephemeral.privateKey);
+    sigs.push(signature);
+    console.log();
+    console.log('payload:', encoded);
+    console.log('octets:', octet_array(payload));
+    console.log('sig:', signature);
+    console.log('octets:', octet_array(Array.from(decode(signature))));
+
+    payload = JSON.stringify('jaydoe@example.org');
+    encoded = encode(payload);
+    jwp.payloads.push(encoded);
+    signature = await sign_payload(encoded, ephemeral.privateKey);
+    sigs.push(signature);
+    console.log();
+    console.log('payload:', encoded);
+    console.log('octets:', octet_array(payload));
+    console.log('sig:', signature);
+    console.log('octets:', octet_array(Array.from(decode(signature))));
+
+    payload = JSON.stringify(42);
+    encoded = encode(payload);
+    jwp.payloads.push(encoded);
+    signature = await sign_payload(encoded, ephemeral.privateKey);
+    sigs.push(signature);
+    console.log();
+    console.log('payload:', encoded);
+    console.log('octets:', octet_array(payload));
+    console.log('sig:', signature);
+    console.log('octets:', octet_array(Array.from(decode(signature))));
+
+    // encode/sign the protected header
+    signature = await sign_payload(jwp.protected, ephemeral.privateKey);
+    sigs.push(signature);
+    console.log();
+    console.log('protected sig:', signature);
+    console.log('octets:', octet_array(Array.from(decode(signature))));
+
     let final = Buffer.from([]);
     for(sig of sigs)
     {
         final = Buffer.concat([final, decode(sig)]);
     }
-    const final_sig = await sign_payload(encode(final), signer.privateKey);
+    console.log();
+    console.log('ephemeral octets:', octet_array(Array.from(final)));
+    const final_sig = await sign_payload(encode(final), stable.privateKey);
     final = Buffer.concat([final, decode(final_sig)]);
     jwp.proof = encode(final);
+    console.log();
+    console.log('final:', encode(final));
+    console.log('octets:', octet_array(Array.from(final)));
+
     console.log();
     console.log('JSON Serialization:');
     console.log(JSON.stringify(jwp,0,2));
