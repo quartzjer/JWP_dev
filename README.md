@@ -1,6 +1,6 @@
 # JWP ref implementation WIP
 
-The code in this repo is the early steps for a reference JWP implementation in node.  It's current state is for supporting the standards work with valid examples.
+The code in this repo is the early steps for a reference JWP implementation in node.  It's current state is for supporting the [standards work](https://github.com/json-web-proofs/json-web-proofs) with valid examples.
 
 The examples below may be out of date, don't use as an authoritative reference.
 
