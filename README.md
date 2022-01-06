@@ -1,6 +1,6 @@
-# JWP scratch/experimentation area
+# JWP ref implementation WIP
 
-Nothing here intended to be reusable, just for learning and testing.
+The code in this repo is the early steps for a reference JWP implementation in node.  It's current state is for supporting the standards work with valid examples.
 
 The examples below may be out of date, don't use as an authoritative reference.
 
