@@ -23,7 +23,7 @@ const ephemeral_key = {
     "d": "Yfg5t1lo9T36QJJkrX0XiPd8Bj0Z6dt3zNqGIkyuOFc"
 }
 
-// hack working around jose wrapper
+// use jose wrapper
 async function sign_payload(payload, key){
     const sig = new GeneralSign(decode(payload));
     sig.addSignature(key).setProtectedHeader({'alg':'ES256'});
@@ -80,6 +80,12 @@ function octet_array(value)
     console.log('octets:', octet_array(JSON.stringify(protected)));
     console.log('encoded:', jwp.protected);
 
+    // encode/sign the protected header w/ the stable key
+    signature = await sign_payload(jwp.protected, stable.privateKey);
+    sigs.push(signature);
+    console.log('protected sig:', signature);
+    console.log('octets:', octet_array(Array.from(decode(signature))));
+    
     // encode/sign each payload
     payload = JSON.stringify('Doe');
     encoded = encode(payload);
@@ -125,22 +131,12 @@ function octet_array(value)
     console.log('sig:', signature);
     console.log('octets:', octet_array(Array.from(decode(signature))));
 
-    // encode/sign the protected header
-    signature = await sign_payload(jwp.protected, ephemeral.privateKey);
-    sigs.push(signature);
-    console.log();
-    console.log('protected sig:', signature);
-    console.log('octets:', octet_array(Array.from(decode(signature))));
-
+    // merge final signature
     let final = Buffer.from([]);
     for(sig of sigs)
     {
         final = Buffer.concat([final, decode(sig)]);
     }
-    console.log();
-    console.log('ephemeral octets:', octet_array(Array.from(final)));
-    const final_sig = await sign_payload(encode(final), stable.privateKey);
-    final = Buffer.concat([final, decode(final_sig)]);
     jwp.proof = encode(final);
     console.log();
     console.log('final:', encode(final));
@@ -152,7 +148,7 @@ function octet_array(value)
 
 
     const serialized = [];
-    serialized.push(encode(JSON.stringify(jwp.protected)));
+    serialized.push(jwp.protected);
     serialized.push(jwp.payloads.join('~'));
     serialized.push(jwp.proof);
     console.log();

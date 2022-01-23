@@ -9,16 +9,16 @@ The examples below may be out of date, don't use as an authoritative reference.
 
 This is a very simple use of traditional ECDSA signatures that supports selective disclosure, unlinkability is only achieved by requiring that each one is single-use.  When the holder has an active relationship with the issuer where they can fetch new single-use credentials dynamically or pre-fetch them in batches, this approach is very efficient and immediately usable with existing traditional crypto libraries.
 
-The issuer generates an ephemeral keypair and uses that to sign each payload, simply appending each of those to compose the initial signature.  The ephemeral public key is included in the headers and integrity protected. They then sign that appended list of signatures with their own stable keypair to create the final issued credential.
+The issuer generates an ephemeral keypair and uses that to sign each payload, simply appending each of those to compose the initial signature.  The ephemeral public key is included in the protected header. They then sign the protected header with their own stable keypair to create the final issued credential.
 
-The holder can then choose which payloads to reveal and only those sections of the signature will need to be validated along with the final signature using the issuer's public key.
+The holder can then choose which payloads to reveal and only those signatures will need to be included along with the protected header signature using the issuer's public key.
 
 Here's some pseudocode:
 ```
 EK = ephemeral key
 IK = issuer key 
-sigs = join(EK.sign(JWK(EK)), EK.sign(payload[0]), EK.sign(payload[1]), EK.sign(payload[2]), ...)
-su_sig = join(sigs, IK.sign(sigs))
+sigs = join(EK.sign(payload[0]), EK.sign(payload[1]), EK.sign(payload[2]), ...)
+su_sig = join(IK.sign(JWK(EK)), sigs)
 ```
 
 JWK
