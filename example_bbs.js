@@ -12,7 +12,14 @@ const { calculateThumbprint } = require('jose/jwk/thumbprint');
 const { encode, decode } = require('jose/util/base64url');
 const { readFileSync } = require('fs');
 const { GeneralSign } = require('jose/jws/general/sign');
+const { randomBytes } = require('crypto');
 
+function octet_array(value)
+{
+    if(value instanceof Uint8Array) value = Array.from(value);
+    if(!Array.isArray(value)) value = Array.from(new TextEncoder("utf-8").encode((value)));
+    return JSON.stringify(value).split(',').join(', ')
+}
 
 (async function(){
     // generate the long-term public key
@@ -27,18 +34,22 @@ const { GeneralSign } = require('jose/jws/general/sign');
     jwk.use = 'proof';
     console.log('JWK:');
     console.log(JSON.stringify(jwk,0,2));
+    console.log('pub', octet_array(keyPair.publicKey));
+    console.log('priv', octet_array(keyPair.secretKey));
 
     // generate jwp
     const jwp = {};
     const protected = {};
-    protected.typ = 'JPT';
-    protected.alg = jwk.alg;
-//    protected.kid = jwk.kid;
-//    protected.issuer = 'https://issuer.tld';
+    protected.iss = 'https://issuer.example';
     protected.claims = ['family_name', 'given_name', 'email', 'age']
-    console.log()
+    protected.typ = 'JPT';
+    protected.alg = 'BBS-X';
+    jwp.protected = encode(JSON.stringify(protected));
+    console.log();
     console.log('Protected Header:');
     console.log(JSON.stringify(protected, 0, 2));
+//    console.log('octets:', octet_array(JSON.stringify(protected)));
+//    console.log('encoded:', jwp.protected);
 
     const protected_buff = Buffer.from(JSON.stringify(protected), 'utf8');
     jwp.protected = encode(protected_buff);
@@ -57,6 +68,10 @@ const { GeneralSign } = require('jose/jws/general/sign');
         keyPair,
         messages
     });
+
+    let x = messages.map((item)=>Array.from(item))
+    console.log('messages',JSON.stringify(x).split(',').join(', '))
+    console.log('signature', octet_array(signature));
   
     jwp.proof = encode(signature);
     console.log()
@@ -72,16 +87,26 @@ const { GeneralSign } = require('jose/jws/general/sign');
     console.log(serialized.join('.'));
 
     // generate a proof with selective disclosure of only the name and age
+    const nonce = randomBytes(32);
+    console.log('nonce', octet_array(nonce));
+
     const proof = await blsCreateProof({
         signature,
         publicKey: keyPair.publicKey,
         messages,
-        nonce: Uint8Array.from(Buffer.from("nonce", "utf8")),
+        nonce: Uint8Array.from(nonce),
         revealed: [0,2,4],
     });
+    console.log('proof', octet_array(proof));
+
+    jwp.payloads[0] = null;
+    jwp.payloads[2] = null;
+    jwp.proof = encode(proof);
+    console.log('JSON Serialization:');
+    console.log(JSON.stringify(jwp,0,2));
+
     jwp.payloads[0] = '';
     jwp.payloads[2] = '';
-
     const presentation = [];
     presentation.push(encode(JSON.stringify(jwp.protected)));
     presentation.push(jwp.payloads.join('~'));
